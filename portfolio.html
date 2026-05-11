@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方秋璇 · 作品集</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Noto+Serif+SC:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F5E642;
+    --coral: #FF5C3A;
+    --navy: #0D1B2A;
+    --cream: #FAF7F0;
+    --mint: #B8F0D8;
+    --lavender: #D4BCFF;
+    --ink: #1A1A1A;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  #cursor {
+    width: 12px; height: 12px;
+    background: var(--coral);
+    border-radius: 50%;
+    position: fixed; pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
+  }
+  #cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--coral);
+    border-radius: 50%;
+    position: fixed; pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, left 0.12s ease, top 0.12s ease;
+    opacity: 0.6;
+  }
+  body:has(a:hover) #cursor, body:has(button:hover) #cursor {
+    width: 28px; height: 28px; background: var(--yellow);
+  }
+
+  /* ── LOADING SCREEN ── */
+  #loader {
+    position: fixed; inset: 0; background: var(--navy); z-index: 9000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 24px;
+  }
+  #loader-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 10vw, 120px);
+    font-weight: 900;
+    color: var(--yellow);
+    letter-spacing: -2px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+  #loader-bar {
+    width: 200px; height: 2px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;
+  }
+  #loader-fill {
+    height: 100%; background: var(--coral); border-radius: 2px;
+    animation: fillBar 1.6s ease forwards;
+  }
+  #loader-sub {
+    font-size: 11px; letter-spacing: 4px; color: rgba(255,255,255,0.4);
+    opacity: 0; animation: fadeUp 0.6s 0.5s forwards;
+  }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  @keyframes fillBar { from { width: 0; } to { width: 100%; } }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 40px;
+    mix-blend-mode: difference;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 700; color: white;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-size: 11px; letter-spacing: 2px; color: white;
+    text-decoration: none; text-transform: uppercase;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -2px; left: 0;
+    width: 0; height: 1px; background: var(--yellow);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh; display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative; overflow: hidden;
+  }
+  .hero-left {
+    background: var(--navy);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 80px 60px; position: relative;
+  }
+  .hero-tag {
+    font-size: 10px; letter-spacing: 4px; color: var(--coral);
+    text-transform: uppercase; margin-bottom: 24px;
+  }
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(56px, 7vw, 96px); font-weight: 900;
+    color: white; line-height: 0.95;
+    margin-bottom: 32px;
+  }
+  .hero-name span { color: var(--yellow); display: block; }
+  .hero-desc {
+    font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.6);
+    max-width: 340px; margin-bottom: 40px;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--yellow); color: var(--navy);
+    padding: 14px 28px; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; text-decoration: none; font-weight: 700;
+    transition: transform 0.2s ease;
+  }
+  .hero-cta:hover { transform: translate(4px, -4px); }
+  .hero-cta-arrow { font-size: 18px; }
+
+  .hero-right {
+    background: var(--yellow);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .hero-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 80px 40px; width: 100%;
+  }
+  .hero-card {
+    background: var(--navy); color: white;
+    padding: 24px; aspect-ratio: 1;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+  .hero-card:nth-child(2) { background: var(--coral); margin-top: 40px; }
+  .hero-card:nth-child(3) { background: var(--mint); color: var(--navy); margin-top: -40px; }
+  .hero-card:nth-child(4) { background: var(--lavender); color: var(--navy); }
+  .hero-card:hover { transform: scale(1.03); z-index: 2; }
+  .hero-card-num {
+    font-size: 48px; font-weight: 700; opacity: 0.15;
+    position: absolute; bottom: 10px; right: 16px;
+    font-family: 'Playfair Display', serif;
+  }
+  .hero-card-title { font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+  .hero-card-desc { font-size: 11px; opacity: 0.7; line-height: 1.5; }
+
+  /* ── MARQUEE ── */
+  .marquee-wrap {
+    overflow: hidden; background: var(--coral); padding: 14px 0;
+    border-top: 2px solid var(--navy); border-bottom: 2px solid var(--navy);
+  }
+  .marquee-track {
+    display: flex; gap: 0; white-space: nowrap;
+    animation: marquee 18s linear infinite;
+    width: max-content;
+  }
+  .marquee-track span {
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    color: white; font-weight: 700; padding: 0 32px;
+  }
+  .marquee-track span.dot { color: var(--yellow); padding: 0; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ── ABOUT ── */
+  #about {
+    display: grid; grid-template-columns: 1fr 1fr; min-height: 80vh;
+  }
+  .about-left {
+    background: var(--mint); padding: 100px 60px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .section-label {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--coral); margin-bottom: 20px;
+  }
+  .about-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 4vw, 56px); font-weight: 900;
+    line-height: 1.1; margin-bottom: 32px; color: var(--navy);
+  }
+  .about-text {
+    font-size: 13px; line-height: 2; color: rgba(13,27,42,0.7);
+    margin-bottom: 40px;
+  }
+  .skills-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-pill {
+    background: var(--navy); color: var(--yellow);
+    padding: 6px 14px; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; border-radius: 100px;
+    transition: transform 0.2s ease;
+  }
+  .skill-pill:hover { transform: translateY(-3px); }
+
+  .about-right {
+    background: var(--lavender); padding: 100px 60px;
+    display: flex; flex-direction: column; justify-content: center; gap: 32px;
+  }
+  .stat-item { border-bottom: 1px solid rgba(13,27,42,0.15); padding-bottom: 24px; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px; font-weight: 900; color: var(--navy); line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(13,27,42,0.5); }
+
+  /* ── WORKS ── */
+  #works { padding: 120px 60px; background: var(--cream); }
+  .works-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 60px;
+  }
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 5vw, 72px); font-weight: 900;
+    color: var(--navy); line-height: 1;
+  }
+  .filter-row { display: flex; gap: 12px; }
+  .filter-btn {
+    padding: 8px 18px; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; border: 1.5px solid var(--navy);
+    background: transparent; cursor: none; font-family: 'Space Mono', monospace;
+    transition: all 0.2s ease;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--navy); color: white;
+  }
+
+  .works-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .work-card {
+    position: relative; overflow: hidden;
+    aspect-ratio: 3/4; cursor: none;
+    background: var(--navy);
+  }
+  .work-card:nth-child(1) { background: #0D1B2A; }
+  .work-card:nth-child(2) { background: var(--coral); grid-row: span 2; aspect-ratio: auto; }
+  .work-card:nth-child(3) { background: var(--navy); }
+  .work-card:nth-child(4) { background: var(--lavender); }
+  .work-card:nth-child(5) { background: var(--mint); }
+  .work-card:nth-child(6) { background: var(--yellow); }
+
+  .work-card-inner {
+    position: absolute; inset: 0; padding: 28px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+    transform: translateY(20px); opacity: 0;
+    transition: all 0.4s ease;
+  }
+  .work-card:hover .work-card-inner { transform: translateY(0); opacity: 1; }
+  .work-card-label {
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--yellow); margin-bottom: 8px;
+  }
+  .work-card-title {
+    font-family: 'Playfair Display', serif; font-size: 22px;
+    font-weight: 700; color: white; line-height: 1.2;
+  }
+  .work-card-bg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 80px; font-weight: 900; opacity: 0.08;
+    color: white; letter-spacing: -4px;
+    transition: transform 0.6s ease, font-size 0.6s ease;
+  }
+  .work-card:hover .work-card-bg { transform: scale(1.15); font-size: 100px; }
+
+  /* ── COPYWRITING SHOWCASE ── */
+  #copy { padding: 120px 60px; background: var(--navy); }
+  .copy-header { margin-bottom: 60px; }
+  .copy-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 5vw, 72px); font-weight: 900;
+    color: var(--yellow); line-height: 1; margin-bottom: 16px;
+  }
+  .copy-sub { font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
+
+  .copy-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .copy-card {
+    background: rgba(255,255,255,0.05); padding: 40px;
+    border: 1px solid rgba(255,255,255,0.08);
+    position: relative; overflow: hidden;
+    transition: background 0.3s ease;
+  }
+  .copy-card:hover { background: rgba(255,255,255,0.1); }
+  .copy-card-tag {
+    display: inline-block; padding: 4px 12px;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    border: 1px solid var(--coral); color: var(--coral);
+    margin-bottom: 24px; border-radius: 100px;
+  }
+  .copy-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: white;
+    margin-bottom: 16px; line-height: 1.3;
+  }
+  .copy-card-text {
+    font-size: 12px; line-height: 2; color: rgba(255,255,255,0.55);
+    margin-bottom: 24px;
+  }
+  .copy-card-meta {
+    display: flex; align-items: center; gap: 20px;
+  }
+  .copy-meta-item { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
+  .copy-meta-item strong { color: var(--yellow); font-size: 16px; display: block; }
+
+  /* ── INTERACTIVE 文案生成器 ── */
+  #playground {
+    padding: 120px 60px; background: var(--yellow);
+  }
+  .play-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 4vw, 60px); font-weight: 900;
+    color: var(--navy); margin-bottom: 8px;
+  }
+  .play-sub { font-size: 12px; color: rgba(13,27,42,0.5); letter-spacing: 2px; margin-bottom: 48px; }
+  .type-selector {
+    display: flex; gap: 4px; margin-bottom: 40px; flex-wrap: wrap;
+  }
+  .type-btn {
+    padding: 10px 20px; font-size: 11px; letter-spacing: 1px;
+    border: 2px solid var(--navy); background: transparent;
+    cursor: none; font-family: 'Space Mono', monospace;
+    transition: all 0.2s ease; font-weight: 700;
+  }
+  .type-btn.active, .type-btn:hover {
+    background: var(--navy); color: var(--yellow);
+  }
+  .copy-display {
+    background: var(--navy); padding: 48px;
+    min-height: 200px; position: relative;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .copy-display-text {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 20px; line-height: 1.8; color: white;
+    transition: opacity 0.3s ease;
+  }
+  .copy-display-source {
+    margin-top: 24px; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--coral);
+  }
+  .copy-nav {
+    display: flex; gap: 12px; margin-top: 24px;
+  }
+  .copy-nav-btn {
+    width: 44px; height: 44px; border: 2px solid white;
+    background: transparent; color: white; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: none; transition: all 0.2s ease; font-family: monospace;
+  }
+  .copy-nav-btn:hover { background: white; color: var(--navy); }
+
+  /* ── PROCESS / TIMELINE ── */
+  #process { padding: 120px 60px; background: var(--cream); }
+  .process-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 4vw, 60px); font-weight: 900;
+    color: var(--navy); margin-bottom: 80px;
+  }
+  .timeline { position: relative; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 1px; background: var(--navy);
+  }
+  .timeline-item {
+    display: grid; grid-template-columns: 48px 1fr;
+    gap: 32px; margin-bottom: 60px; position: relative;
+  }
+  .timeline-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--coral); margin-top: 6px;
+    position: relative; z-index: 1;
+    box-shadow: 0 0 0 4px var(--cream);
+    transition: transform 0.3s ease;
+    cursor: none;
+  }
+  .timeline-item:hover .timeline-dot { transform: scale(1.5); background: var(--yellow); }
+  .timeline-content { padding-bottom: 48px; border-bottom: 1px solid rgba(13,27,42,0.1); }
+  .timeline-num { font-size: 10px; letter-spacing: 3px; color: var(--coral); margin-bottom: 8px; }
+  .timeline-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 700; color: var(--navy);
+    margin-bottom: 12px;
+  }
+  .timeline-desc { font-size: 12px; line-height: 2; color: rgba(13,27,42,0.6); }
+
+  /* ── CONTACT ── */
+  #contact {
+    min-height: 80vh; background: var(--navy);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 120px 60px; text-align: center; position: relative; overflow: hidden;
+  }
+  .contact-bg-text {
+    position: absolute; font-family: 'Playfair Display', serif;
+    font-size: 300px; font-weight: 900; opacity: 0.04; color: white;
+    white-space: nowrap; pointer-events: none;
+    animation: drift 20s ease-in-out infinite alternate;
+  }
+  @keyframes drift { from { transform: translateX(-40px); } to { transform: translateX(40px); } }
+  .contact-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--coral); margin-bottom: 24px; }
+  .contact-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 8vw, 100px); font-weight: 900;
+    color: white; line-height: 1; margin-bottom: 32px;
+  }
+  .contact-heading span { color: var(--yellow); }
+  .contact-sub { font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 2px; margin-bottom: 48px; }
+  .contact-links { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .contact-link {
+    padding: 14px 32px; border: 1.5px solid rgba(255,255,255,0.3);
+    color: white; text-decoration: none; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .contact-link::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--coral); transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s ease; z-index: -1;
+  }
+  .contact-link:hover::before { transform: scaleX(1); }
+  .contact-link:hover { border-color: var(--coral); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    #hero, #about { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .works-grid, .copy-cards { grid-template-columns: 1fr; }
+    nav { padding: 16px 20px; }
+    .hero-left, .about-left, .about-right, #works, #copy, #playground, #process { padding: 60px 24px; }
+    .works-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+    #contact { padding: 80px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div id="loader-name">方秋璇</div>
+  <div id="loader-sub">PORTFOLIO · LOADING</div>
+  <div id="loader-bar"><div id="loader-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#hero">FQX</a>
+  <ul class="nav-links">
+    <li><a href="#about">关于</a></li>
+    <li><a href="#works">作品</a></li>
+    <li><a href="#copy">文案</a></li>
+    <li><a href="#contact">联系</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <p class="hero-tag">内容创作者 · 新媒体运营 · 影像叙事</p>
+    <h1 class="hero-name">方<span>秋璇</span></h1>
+    <p class="hero-desc">用文字构建情感连接，用镜头记录真实温度。<br>擅长跨平台内容策略与深度叙事创作。</p>
+    <a href="#works" class="hero-cta">查看作品 <span class="hero-cta-arrow">→</span></a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-grid">
+      <div class="hero-card">
+        <span class="hero-card-title">文案写作</span>
+        <span class="hero-card-desc">从痛点到共鸣</span>
+        <span class="hero-card-num">01</span>
+      </div>
+      <div class="hero-card">
+        <span class="hero-card-title">视频剪辑</span>
+        <span class="hero-card-desc">叙事即情感</span>
+        <span class="hero-card-num">02</span>
+      </div>
+      <div class="hero-card">
+        <span class="hero-card-title">新媒体运营</span>
+        <span class="hero-card-desc">数据驱动创意</span>
+        <span class="hero-card-num">03</span>
+      </div>
+      <div class="hero-card">
+        <span class="hero-card-title">内容策划</span>
+        <span class="hero-card-desc">全链路执行</span>
+        <span class="hero-card-num">04</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>文案创作</span><span class="dot">✦</span>
+    <span>新媒体运营</span><span class="dot">✦</span>
+    <span>视频剪辑</span><span class="dot">✦</span>
+    <span>内容策划</span><span class="dot">✦</span>
+    <span>YouTube矩阵</span><span class="dot">✦</span>
+    <span>小红书运营</span><span class="dot">✦</span>
+    <span>纪录片剪辑</span><span class="dot">✦</span>
+    <span>跨平台传播</span><span class="dot">✦</span>
+    <span>文案创作</span><span class="dot">✦</span>
+    <span>新媒体运营</span><span class="dot">✦</span>
+    <span>视频剪辑</span><span class="dot">✦</span>
+    <span>内容策划</span><span class="dot">✦</span>
+    <span>YouTube矩阵</span><span class="dot">✦</span>
+    <span>小红书运营</span><span class="dot">✦</span>
+    <span>纪录片剪辑</span><span class="dot">✦</span>
+    <span>跨平台传播</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-left reveal">
+    <p class="section-label">关于我</p>
+    <h2 class="about-heading">创作是<br>我的语言</h2>
+    <p class="about-text">
+      广州新华学院传播学在读，热爱用文字和镜头讲故事。<br><br>
+      做过小红书从0到1的账号，管过多账号YouTube矩阵，拍过律师的人生纪录片，剪过穗港青年的文化交流影像。<br><br>
+      <em>不想只做流量，想做有温度的内容。</em>
+    </p>
+    <div class="skills-row">
+      <span class="skill-pill">PS · PR · 剪映</span>
+      <span class="skill-pill">小红书</span>
+      <span class="skill-pill">YouTube</span>
+      <span class="skill-pill">TikTok</span>
+      <span class="skill-pill">英语六级</span>
+      <span class="skill-pill">摄影</span>
+      <span class="skill-pill">文案写作</span>
+    </div>
+  </div>
+  <div class="about-right reveal">
+    <div class="stat-item">
+      <div class="stat-num">3+</div>
+      <div class="stat-label">年内容创作经验</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">多</div>
+      <div class="stat-label">平台运营实战经历</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100<span style="font-size:36px">+</span></div>
+      <div class="stat-label">小红书粉丝增量（单账号）</div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKS -->
+<section id="works">
+  <div class="works-header reveal">
+    <div>
+      <p class="section-label">作品集</p>
+      <h2 class="section-heading">Selected<br>Works</h2>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active">全部</button>
+      <button class="filter-btn">视频</button>
+      <button class="filter-btn">运营</button>
+      <button class="filter-btn">文案</button>
+    </div>
+  </div>
+  <div class="works-grid reveal">
+    <div class="work-card">
+      <div class="work-card-bg">法律</div>
+      <div class="work-card-inner">
+        <span class="work-card-label">纪录片 · 独立剪辑</span>
+        <h3 class="work-card-title">律师行业洞察<br>访谈纪录片</h3>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg">港</div>
+      <div class="work-card-inner">
+        <span class="work-card-label">影像志 · 剪辑/文案</span>
+        <h3 class="work-card-title">穗港青年<br>研学影像志</h3>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg">✦</div>
+      <div class="work-card-inner">
+        <span class="work-card-label">运营 · 小红书</span>
+        <h3 class="work-card-title">小红书账号<br>从0到1运营</h3>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg">侨</div>
+      <div class="work-card-inner">
+        <span class="work-card-label">纪实片 · 独立剪辑</span>
+        <h3 class="work-card-title">侨界青年<br>文化交融纪实</h3>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg">YT</div>
+      <div class="work-card-inner">
+        <span class="work-card-label">运营 · YouTube矩阵</span>
+        <h3 class="work-card-title">多账号矩阵<br>规模化运营</h3>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg">文</div>
+      <div class="work-card-inner">
+        <span class="work-card-label">文案 · 创意写作</span>
+        <h3 class="work-card-title">品牌文案<br>内容创作</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COPYWRITING SHOWCASE -->
+<section id="copy">
+  <div class="copy-header reveal">
+    <p class="section-label" style="color:var(--coral)">文案实例</p>
+    <h2 class="copy-heading">Words<br>that work.</h2>
+    <p class="copy-sub">每一句都有它想去的地方</p>
+  </div>
+  <div class="copy-cards reveal">
+    <div class="copy-card">
+      <span class="copy-card-tag">小红书 · 生活类</span>
+      <h3 class="copy-card-title">「凌晨三点，我终于想通了一件事」</h3>
+      <p class="copy-card-text">
+        不是所有的努力都要有结果，<br>
+        有些事，做了，只是因为你喜欢。<br>
+        这就够了。
+      </p>
+      <div class="copy-card-meta">
+        <div class="copy-meta-item"><strong style="color:var(--yellow)">在这里放</strong>真实数据</div>
+        <div class="copy-meta-item"><strong style="color:var(--mint)">互动率</strong>待填写</div>
+      </div>
+    </div>
+    <div class="copy-card">
+      <span class="copy-card-tag">品牌推广 · 产品文案</span>
+      <h3 class="copy-card-title">「不是贵，是值得」</h3>
+      <p class="copy-card-text">
+        你买的不只是一件东西，<br>
+        是那个买完之后，<br>
+        走路都带风的自己。
+      </p>
+      <div class="copy-card-meta">
+        <div class="copy-meta-item"><strong style="color:var(--yellow)">在这里放</strong>真实数据</div>
+        <div class="copy-meta-item"><strong style="color:var(--mint)">转化率</strong>待填写</div>
+      </div>
+    </div>
+    <div class="copy-card">
+      <span class="copy-card-tag">纪录片 · 旁白文案</span>
+      <h3 class="copy-card-title">「每一个案子背后，都是一个人的人生」</h3>
+      <p class="copy-card-text">
+        他说，做律师二十年，<br>
+        让他印象最深的，<br>
+        不是赢了多少，是帮了谁。
+      </p>
+      <div class="copy-card-meta">
+        <div class="copy-meta-item"><strong style="color:var(--yellow)">律师认证</strong>成片</div>
+      </div>
+    </div>
+    <div class="copy-card">
+      <span class="copy-card-tag">影像志 · 开场文案</span>
+      <h3 class="copy-card-title">「两座城，一群年轻人，一次相遇」</h3>
+      <p class="copy-card-text">
+        广府的烟火气，<br>
+        藏在那碗热腾腾的肠粉里，<br>
+        也藏在他们第一次听到粤语时的眼神里。
+      </p>
+      <div class="copy-card-meta">
+        <div class="copy-meta-item"><strong style="color:var(--yellow)">文化</strong>交流项目</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERACTIVE COPY PLAYGROUND -->
+<section id="playground">
+  <p class="section-label">互动体验</p>
+  <h2 class="play-heading reveal">文案风格<br>展示台</h2>
+  <p class="play-sub">点击切换不同场景的文案风格</p>
+  <div class="type-selector reveal">
+    <button class="type-btn active" data-type="0">情感共鸣型</button>
+    <button class="type-btn" data-type="1">痛点直击型</button>
+    <button class="type-btn" data-type="2">故事叙述型</button>
+    <button class="type-btn" data-type="3">场景代入型</button>
+  </div>
+  <div class="copy-display reveal">
+    <div class="copy-display-text" id="copy-text"></div>
+    <div>
+      <div class="copy-display-source" id="copy-source"></div>
+      <div class="copy-nav">
+        <button class="copy-nav-btn" id="prev-btn">←</button>
+        <button class="copy-nav-btn" id="next-btn">→</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <h2 class="process-heading reveal">我的<br>创作流程</h2>
+  <div class="timeline reveal">
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <p class="timeline-num">01 / RESEARCH</p>
+        <h3 class="timeline-title">深挖选题，找到共鸣点</h3>
+        <p class="timeline-desc">研究目标人群的真实需求和情绪锚点，寻找那个"说出了大家心里话"的切入口，而不只是追热点。</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <p class="timeline-num">02 / SCRIPT</p>
+        <h3 class="timeline-title">构建叙事，搭建情感结构</h3>
+        <p class="timeline-desc">从钩子、冲突到落点，每一段文案和脚本都有清晰的情感弧线，让人想看完，看完想分享。</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <p class="timeline-num">03 / CREATE</p>
+        <h3 class="timeline-title">执行创作，打磨每个细节</h3>
+        <p class="timeline-desc">文案写完要大声读出来，剪辑看完要给陌生人看。不满意就推翻重来，细节是专业度的体现。</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <p class="timeline-num">04 / OPTIMIZE</p>
+        <h3 class="timeline-title">数据反馈，持续迭代优化</h3>
+        <p class="timeline-desc">发布后追踪完播率、互动率、点击率，用数据告诉自己哪里对、哪里需要改，下一次做得更好。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-bg-text">联系我</div>
+  <p class="contact-label">Let's work together</p>
+  <h2 class="contact-heading reveal">一起做<br><span>有意思</span><br>的内容</h2>
+  <p class="contact-sub">SHENZHEN · AVAILABLE FOR FULL-TIME & INTERNSHIP</p>
+  <div class="contact-links reveal">
+    <a class="contact-link" href="tel:18306639467">📱 183 0663 9467</a>
+    <a class="contact-link" href="mailto:3382248149@qq.com">✉ 发邮件给我</a>
+    <a class="contact-link" href="#">小红书</a>
+  </div>
+</section>
+
+<script>
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function animCursor() {
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+})();
+
+// ── LOADER ──
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const loader = document.getElementById('loader');
+    loader.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    loader.style.opacity = '0';
+    loader.style.transform = 'translateY(-20px)';
+    setTimeout(() => loader.style.display = 'none', 600);
+  }, 2000);
+});
+
+// ── SCROLL REVEAL ──
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── FILTER BUTTONS ──
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// ── COPY PLAYGROUND ──
+const copyData = {
+  0: [ // 情感共鸣型
+    { text: "有些时刻，不需要任何解释。\n就是突然很想哭，\n然后又突然觉得，这样也挺好的。", source: "情感类 · 小红书" },
+    { text: "你没有变得更差，\n你只是很久没有休息了。\n给自己一点时间，就好。", source: "情感类 · 小红书" },
+    { text: "长大之后才明白，\n有些话说出口就是负担，\n所以选择把它写下来。", source: "情感类 · 创意写作" },
+  ],
+  1: [ // 痛点直击型
+    { text: "你做内容三个月，\n没有一条破百赞——\n不是你没才华，是你没踩准节奏。", source: "运营类 · 博主成长" },
+    { text: "为什么你的文案有人读，\n他的有人买？\n差的不是文字，是你忘了对方想要什么。", source: "文案培训 · 痛点文案" },
+    { text: "不是没人看你，\n是你的标题，\n让人以为里面没什么值得看的。", source: "内容运营 · 标题优化" },
+  ],
+  2: [ // 故事叙述型
+    { text: "他做了二十年律师，\n赢过很多案子，\n但让他记住的，是那个最后没钱付律师费的当事人。", source: "律师纪录片 · 旁白文案" },
+    { text: "那是他们第一次来广州，\n第一口肠粉下去，\n他用粤语说了句「好味」，\n全桌人都笑了。", source: "穗港研学影像志 · 开场旁白" },
+    { text: "那年她刚毕业，\n账上只有三百块，\n她说，反正也没什么好怕的了。", source: "人物故事 · 创意写作" },
+  ],
+  3: [ // 场景代入型
+    { text: "下班路上，地铁里，\n耳机里放着没听完的播客，\n你突然觉得——\n这一天还挺好的。", source: "生活方式类 · 场景文案" },
+    { text: "周五下午四点半，\n距离下班还有三十分钟，\n你假装在看文件，\n其实在想晚上吃什么。", source: "职场类 · 情绪共鸣" },
+    { text: "拍了一百张，\n只有一张你满意，\n但就是那一张，\n让你觉得今天没白出门。", source: "摄影/生活类 · 创意文案" },
+  ]
+};
+
+let currentType = 0, currentIdx = 0;
+
+function updateCopy() {
+  const el = document.getElementById('copy-text');
+  const src = document.getElementById('copy-source');
+  el.style.opacity = '0';
+  setTimeout(() => {
+    const items = copyData[currentType];
+    const item = items[currentIdx % items.length];
+    el.textContent = item.text;
+    src.textContent = item.source;
+    el.style.opacity = '1';
+  }, 200);
+}
+
+document.querySelectorAll('.type-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentType = parseInt(this.dataset.type);
+    currentIdx = 0;
+    updateCopy();
+  });
+});
+
+document.getElementById('prev-btn').addEventListener('click', () => {
+  const len = copyData[currentType].length;
+  currentIdx = (currentIdx - 1 + len) % len;
+  updateCopy();
+});
+document.getElementById('next-btn').addEventListener('click', () => {
+  currentIdx = (currentIdx + 1) % copyData[currentType].length;
+  updateCopy();
+});
+
+updateCopy();
+
+// ── PARALLAX on HERO ──
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const heroLeft = document.querySelector('.hero-left');
+  if (heroLeft) heroLeft.style.transform = `translateY(${y * 0.15}px)`;
+});
+</script>
+</body>
+</html>
